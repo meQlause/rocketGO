@@ -12,7 +12,7 @@ func main() {
     g := game.NewGame()
 
     ebiten.SetWindowSize(config.ScreenWidth, config.ScreenHeight)
-    ebiten.SetWindowTitle("Simple Ebiten Game")
+    ebiten.SetWindowTitle("RocketGO")
 
     if err := ebiten.RunGame(g); err != nil {
         log.Fatal(err)

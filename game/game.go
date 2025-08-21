@@ -17,6 +17,7 @@ type Game struct {
     iteration float64
     distance float64
     speed float64
+    rotateSpeed float64
 }
 
 func NewGame() *Game {
@@ -25,6 +26,7 @@ func NewGame() *Game {
         iteration: 0,
         distance: 0,
         speed: 0,
+        rotateSpeed: 0,
     }
 }
 
@@ -33,13 +35,22 @@ func (g *Game) Update() error {
     g.speed = float64((g.iteration / 1000 * 9.8) * 100)
     g.distance = float64((0.5 * 9.8 * math.Pow((g.iteration/1000), 2)) * 100)
     g.Rocket.Update(&g.distance)
+    
+    if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
+        g.rotateSpeed += 0.001
+    }
+        
+    if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+        g.rotateSpeed -= 0.001
+    }
+
+    g.Rocket.Angle += g.rotateSpeed
     return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
     text.Draw(screen, "Speed : "+strconv.FormatFloat(g.speed, 'f', 2, 64)+" m/s",
         basicfont.Face7x13, 10, 100, color.White)
-
     text.Draw(screen, "Distance : "+strconv.FormatFloat(g.distance, 'f', 2, 64)+" m",
         basicfont.Face7x13, 10, 120, color.White)
     g.Rocket.Draw(screen)
