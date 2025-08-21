@@ -18,6 +18,7 @@ type Game struct {
     distance float64
     speed float64
     rotateSpeed float64
+    energy float64
 }
 
 func NewGame() *Game {
@@ -27,13 +28,17 @@ func NewGame() *Game {
         distance: 0,
         speed: 0,
         rotateSpeed: 0,
+        energy: 0,
     }
 }
 
 func (g *Game) Update() error {
     g.iteration++
-    g.speed = float64((g.iteration / 1000 * 9.8) * 100)
-    g.distance = float64((0.5 * 9.8 * math.Pow((g.iteration/1000), 2)) * 100)
+
+    speedCanceled := math.Sqrt((2*g.energy)/30000000)
+    dt := 1.0 / 60.0              
+    g.speed += (9.8 * dt) - speedCanceled             
+    g.distance += g.speed * dt     
     g.Rocket.Update(&g.distance)
     
     if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
@@ -42,6 +47,13 @@ func (g *Game) Update() error {
         
     if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
         g.rotateSpeed -= 0.001
+    }
+
+    if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+        g.iteration += 2
+        g.energy += 10000
+    } else {
+        g.energy = 0
     }
 
     g.Rocket.Angle += g.rotateSpeed
@@ -53,6 +65,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
         basicfont.Face7x13, 10, 100, color.White)
     text.Draw(screen, "Distance : "+strconv.FormatFloat(g.distance, 'f', 2, 64)+" m",
         basicfont.Face7x13, 10, 120, color.White)
+    text.Draw(screen, "Energy (Joule) : "+strconv.FormatFloat(g.energy, 'f', 2, 64)+" J",
+        basicfont.Face7x13, 10, 140, color.White)
+    text.Draw(screen, "Rocket's mass (KG) : 30.000.000 KG",
+        basicfont.Face7x13, 10, 160, color.White)
     g.Rocket.Draw(screen)
 }
 
