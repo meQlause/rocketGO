@@ -3,7 +3,7 @@ package object
 import (
 	"log"
 	"math"
-	"os"
+	"bytes"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -18,11 +18,10 @@ type Object struct {
     objectSound *audio.Player
 }
 
-
-func NewObject(size float64, imageLocation string) *Object {
-    if rocket, _, err := ebitenutil.NewImageFromFile(imageLocation); err == nil {
+func NewObject(size float64, imageByte []byte) *Object {
+    if rocket, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(imageByte)); err == nil {
         return &Object{
-            xInit: 400,
+            xInit: 600,
             Size: size,
             Img: rocket,
         }
@@ -32,12 +31,9 @@ func NewObject(size float64, imageLocation string) *Object {
     return nil
 }
 
-func (p *Object) LoadWav(filename string, audioContext *audio.Context) *Object {
+func (p *Object) LoadWav(fileByte []byte, audioContext *audio.Context) *Object {
     p.audioContext = audioContext
-    f, err := os.Open(filename)
-    if err != nil {
-        log.Fatalf("failed to open wav file: %v", err)
-    }
+    f := bytes.NewReader(fileByte)
 
     d, err := wav.DecodeWithSampleRate(44100, f)
     if err != nil {
